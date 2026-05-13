@@ -1,70 +1,633 @@
-<!DOCTYPE html><html lang="pt-BR">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rede Azul | Autismo, Família e Saúde Mental</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    :root{
-      --azul:#1d9bf0;--azul2:#78d8ff;--profundo:#0f3d5e;--texto:#17324a;--muted:#65798a;
-      --fundo:#f2fbff;--card:#ffffff;--borda:rgba(29,155,240,.2);--verde:#06d6a0;--amarelo:#ffd166;--vermelho:#ef476f;
-    }
-    *{box-sizing:border-box} body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(180deg,#eaf8ff,#fff 45%,#f4fbff);color:var(--texto);line-height:1.55}
-    header{text-align:center;padding:34px 18px 20px;background:radial-gradient(circle at top left,rgba(120,216,255,.45),transparent 35%),radial-gradient(circle at top right,rgba(255,209,102,.35),transparent 28%)}
-    .pieces{display:flex;gap:8px;justify-content:center;margin-bottom:14px}.piece{width:20px;height:20px;border-radius:7px;transform:rotate(12deg);box-shadow:0 6px 16px rgba(0,0,0,.1)}.b{background:var(--azul)}.y{background:var(--amarelo)}.r{background:var(--vermelho)}.g{background:var(--verde)}
-    h1{margin:0;color:var(--profundo);font-size:clamp(2rem,5vw,3.3rem)} header p{max-width:920px;margin:10px auto 0;color:var(--muted);font-size:1.05rem}
-    nav{max-width:1180px;margin:16px auto;padding:0 16px;display:flex;gap:10px;overflow-x:auto} nav button{border:1px solid var(--borda);background:#fff;color:var(--profundo);font-weight:800;border-radius:999px;padding:11px 15px;white-space:nowrap;cursor:pointer} nav button.active{background:linear-gradient(135deg,var(--azul),var(--azul2));color:white;border-color:transparent}
-    main{max-width:1180px;margin:0 auto;padding:0 16px 34px}.screen{display:none}.screen.active{display:block}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{background:var(--card);border:1px solid var(--borda);border-radius:26px;padding:22px;box-shadow:0 20px 50px rgba(15,61,94,.10)}
-    .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:20px}.tag{display:inline-block;background:rgba(29,155,240,.1);color:var(--profundo);font-weight:800;border-radius:999px;padding:8px 13px;margin-bottom:10px} h2,h3{color:var(--profundo);margin-top:0}.muted,small{color:var(--muted)}
-    .btn{border:0;background:linear-gradient(135deg,var(--azul),var(--azul2));color:#fff;padding:13px 16px;border-radius:16px;font-weight:900;cursor:pointer;font-size:1rem}.btn.alt{background:white;color:var(--profundo);border:1px solid var(--borda)}
-    label{display:block;margin:13px 0 6px;font-weight:800;color:var(--profundo)} input,select,textarea{width:100%;border:1px solid var(--borda);border-radius:16px;padding:12px;font-size:1rem;outline:none;background:#fff;color:var(--texto)} textarea{min-height:100px;resize:vertical}
-    .block-title{margin:25px 0 8px;padding:12px 14px;border-radius:18px;background:rgba(29,155,240,.09);color:var(--profundo);font-weight:900;border:1px solid var(--borda)}
-    .question{margin:12px 0;padding:15px;border-radius:20px;background:#f8fdff;border:1px solid var(--borda)}.scale{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:8px}.scale input{display:none}.scale span{display:block;text-align:center;background:#fff;border:1px solid var(--borda);border-radius:13px;padding:9px 4px;cursor:pointer;font-weight:800}.scale input:checked+span{background:var(--azul);color:#fff;border-color:var(--azul)}
-    .lesson{border-left:6px solid var(--azul)}.lesson.y{border-left-color:var(--amarelo)}.lesson.g{border-left-color:var(--verde)}.lesson.r{border-left-color:var(--vermelho)}
-    .quiz-option{display:block;width:100%;text-align:left;padding:13px;margin:8px 0;background:white;border:1px solid var(--borda);border-radius:15px;cursor:pointer;color:var(--profundo);font-weight:800}.correct{background:rgba(6,214,160,.16)!important;border-color:var(--verde)!important}.wrong{background:rgba(239,71,111,.13)!important;border-color:var(--vermelho)!important}
-    .result-box{display:none;margin-top:16px;border-radius:20px;padding:18px;background:#f8fcff;border:1px solid var(--borda)}.low{color:#048b68}.mod{color:#a26f00}.high{color:#c9184a}
-    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:15px 0}.stat{text-align:center;background:#fff;border:1px solid var(--borda);border-radius:18px;padding:15px}.stat strong{display:block;color:var(--azul);font-size:1.7rem} canvas{background:#fff;border:1px solid var(--borda);border-radius:18px;padding:10px;margin-top:14px}
-    .depoimento{border-left:5px solid var(--azul);background:#fff;border-radius:18px;padding:15px;margin:10px 0;border-top:1px solid var(--borda);border-right:1px solid var(--borda);border-bottom:1px solid var(--borda)} footer{text-align:center;color:var(--muted);padding:20px;font-size:.9rem}
-    @media(max-width:900px){.hero,.grid,.grid2,.stats{grid-template-columns:1fr}.scale{grid-template-columns:repeat(5,minmax(42px,1fr))}}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Saúde Mental de Pais de Autistas + Quiz Educativo</title>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Font Awesome 6 (opcional, apenas para ícones) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #f0f7ff;
+            color: #1e2f3e;
+            padding: 24px 16px;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        /* cabeçalho */
+        .hero {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .hero h1 {
+            font-size: 1.9rem;
+            color: #0b3b5f;
+            margin-bottom: 8px;
+        }
+        .hero p {
+            color: #2c5a7a;
+            font-size: 1.1rem;
+        }
+
+        /* cards */
+        .card {
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.05);
+            padding: 24px 28px;
+            margin-bottom: 48px;
+            transition: all 0.2s;
+        }
+        .card h2 {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.7rem;
+            margin-bottom: 20px;
+            color: #0e4b6e;
+            border-left: 6px solid #3b82f6;
+            padding-left: 16px;
+        }
+        .card h2 i {
+            font-size: 1.6rem;
+            color: #3b82f6;
+        }
+
+        /* saúde mental = tabela likert */
+        .likert-grid {
+            overflow-x: auto;
+        }
+        .question-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+            align-items: center;
+            background: #fefefe;
+            border-bottom: 1px solid #e2edf7;
+            padding: 14px 8px;
+        }
+        .question-text {
+            grid-column: span 5;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1f3b4c;
+        }
+        .options {
+            grid-column: span 5;
+            display: flex;
+            justify-content: space-between;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .option-item {
+            flex: 1;
+            text-align: center;
+            font-size: 0.85rem;
+            background: #f9fafb;
+            border-radius: 40px;
+            padding: 6px 4px;
+        }
+        .option-item input {
+            margin-right: 5px;
+            transform: scale(1);
+            accent-color: #3b82f6;
+        }
+        @media (min-width: 768px) {
+            .question-row {
+                display: grid;
+                grid-template-columns: 2fr 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr;
+                gap: 10px;
+            }
+            .question-text {
+                grid-column: span 1;
+                margin-bottom: 0;
+            }
+            .options {
+                grid-column: span 5;
+                display: flex;
+                justify-content: space-around;
+            }
+        }
+
+        .btn {
+            background: #3b82f6;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 60px;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-secondary {
+            background: #475569;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #3b82f6;
+            color: #3b82f6;
+        }
+        .btn-outline:hover {
+            background: #3b82f610;
+        }
+        .btn:hover {
+            opacity: 0.9;
+            transform: scale(0.98);
+        }
+
+        .stats {
+            background: #eef4ff;
+            border-radius: 24px;
+            padding: 20px;
+            margin-top: 28px;
+        }
+        .stats-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 24px;
+            padding: 14px 20px;
+            flex: 1;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        canvas {
+            max-height: 300px;
+            margin: 20px 0;
+        }
+
+        /* quiz estilos */
+        .quiz-question {
+            background: #ffffffd9;
+            border-radius: 24px;
+            padding: 18px 20px;
+            margin-bottom: 24px;
+            border: 1px solid #cbdde9;
+            transition: 0.1s;
+        }
+        .quiz-question h4 {
+            font-size: 1.2rem;
+            margin-bottom: 14px;
+            color: #0b3b5f;
+        }
+        .quiz-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+        .quiz-option {
+            background: #f1f5f9;
+            padding: 8px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: 0.1s;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .quiz-option.selected-correct {
+            background: #bbf7d0;
+            border: 1px solid #22c55e;
+        }
+        .quiz-option.selected-wrong {
+            background: #ffe4e2;
+            border: 1px solid #ef4444;
+        }
+        .quiz-option input {
+            margin-right: 6px;
+        }
+        .feedback {
+            margin-top: 12px;
+            padding: 12px 16px;
+            border-radius: 20px;
+            background: #f8fafc;
+            font-size: 0.9rem;
+            border-left: 5px solid #3b82f6;
+            display: none;
+        }
+        .feedback.show {
+            display: block;
+        }
+        .score-area {
+            margin-top: 15px;
+            text-align: right;
+            font-weight: bold;
+        }
+        hr {
+            margin: 20px 0;
+            border: none;
+            height: 2px;
+            background: linear-gradient(to right, #cbdde9, transparent);
+        }
+        .warning {
+            color: #b91c1c;
+            font-size: 0.8rem;
+            margin-top: 8px;
+        }
+        footer {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #5c7a92;
+            margin-top: 30px;
+        }
+        @media (max-width: 680px) {
+            .card {
+                padding: 18px;
+            }
+            .quiz-options {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+    </style>
 </head>
 <body>
-<header>
-  <div class="pieces"><span class="piece b"></span><span class="piece y"></span><span class="piece r"></span><span class="piece g"></span></div>
-  <h1>Rede Azul</h1>
-  <p>Educação, acolhimento, saúde mental familiar e conscientização sobre o autismo para pais, escolas, agentes de saúde e comunidade.</p>
-</header>
-<nav>
-  <button class="active" onclick="abrirTela('inicio',this)">Início</button><button onclick="abrirTela('pesquisa',this)">Enquete detalhada</button><button onclick="abrirTela('trilhas',this)">Trilhas educativas</button><button onclick="abrirTela('quiz',this)">Quiz</button><button onclick="abrirTela('duvidas',this)">Dúvidas</button><button onclick="abrirTela('declaracoes',this)">Declarações</button><button onclick="abrirTela('painel',this)">Painel</button>
-</nav>
-<main>
-<section id="inicio" class="screen active">
-  <div class="hero">
-    <div class="card"><span class="tag">💙 Cuidar de quem cuida</span><h2>Uma plataforma de orientação, escuta e dados sobre autismo.</h2><p>O projeto ajuda pais e cuidadores a refletirem sobre saúde mental, rotina, comunicação, escola, terapias e rede de apoio.</p><p class="muted">Não fecha diagnóstico. Orienta, acolhe, organiza dados e indica quando buscar avaliação profissional.</p><button class="btn" onclick="abrirTela('pesquisa',document.querySelectorAll('nav button')[1])">Responder enquete</button></div>
-    <div class="card"><h3>Objetivos</h3><ul><li>Ouvir famílias e cuidadores.</li><li>Gerar estatísticas regionais.</li><li>Ensinar estratégias simples de estimulação.</li><li>Divulgar informação em escolas, UBS e redes sociais.</li><li>Acolher famílias em fase de suspeita ou diagnóstico.</li></ul></div>
-  </div>
-</section>
-<section id="pesquisa" class="screen">
-  <div class="card"><h2>Enquete detalhada</h2><p class="muted">São 20 perguntas em escala de 1 a 5. Responda pensando nas últimas duas semanas.</p>
-    <form id="surveyForm">
-      <div class="grid2"><div><label>Município ou região</label><input id="municipio" required placeholder="Ex.: Abaetetuba, Belém, Barcarena..."></div><div><label>Quem está respondendo?</label><select id="vinculo" required><option value="">Selecione</option><option>Mãe</option><option>Pai</option><option>Avó/Avô</option><option>Professor(a)</option><option>Agente de saúde</option><option>Outro cuidador</option></select></div></div>
-      <div class="grid2"><div><label>Idade da criança/adolescente</label><input type="number" id="idade_filho" min="0" max="19" required></div><div><label>Situação do diagnóstico</label><select id="diagnostico" required><option value="">Selecione</option><option>Diagnóstico confirmado</option><option>Em investigação</option><option>Suspeita pela família</option><option>Suspeita pela escola</option><option>Não sei</option></select></div></div>
-      <label>Como recebeu ou está recebendo essa informação?</label><select id="como_recebeu" required><option value="">Selecione</option><option>Com acolhimento e orientação clara</option><option>Com pouca explicação</option><option>De forma fria ou traumática</option><option>Descobri pesquisando por conta própria</option><option>Ainda estou confuso(a)</option></select>
-      <label>Rede de apoio atual</label><select id="rede_apoio" required><option value="">Selecione</option><option>Boa rede de apoio</option><option>Pouca rede de apoio</option><option>Sem rede de apoio</option></select>
-      <div id="questions"></div>
-      <label>O que mais pesa hoje para sua família?</label><textarea id="comentario" placeholder="Ex.: sono, escola, crises, alimentação, medo do futuro, falta de terapias..."></textarea>
-      <button class="btn" type="submit">Enviar e ver orientação</button>
-    </form><div id="resultBox" class="result-box"></div>
-  </div>
-</section>
-<section id="trilhas" class="screen"><div class="grid2"><div class="card lesson"><h3>Plasticidade cerebral</h3><p>O cérebro aprende com repetição, vínculo e treino. Pequenas ações diárias criam caminhos novos.</p><p><b>Prática:</b> escolha uma habilidade por semana: olhar, apontar, pedir, esperar, guardar ou imitar.</p></div><div class="card lesson y"><h3>Comunicação antes da fala</h3><p>Comunicar não é só falar. Olhar, apontar, entregar objeto, escolher figuras e vocalizar também contam.</p><p><b>Prática:</b> ofereça duas escolhas e espere a tentativa.</p></div><div class="card lesson g"><h3>Participação sem sofrimento</h3><p>Evitar isolamento não significa forçar ambientes caóticos. Faça exposição gradual, previsível e com pausas.</p></div><div class="card lesson r"><h3>Autonomia possível</h3><p>O objetivo não é apagar a identidade da criança, mas ampliar comunicação, segurança e qualidade de vida.</p></div></div></section>
-<section id="quiz" class="screen"><div class="card"><h2>Quiz orientativo</h2><div id="quizBox"></div></div></section>
-<section id="duvidas" class="screen"><div class="grid2"><div class="card"><h3>Meu filho não fala. É sempre autismo?</h3><p>Não. Mas atraso de comunicação social merece avaliação com profissional capacitado.</p></div><div class="card"><h3>Quando procurar avaliação?</h3><p>Atraso de fala, não responder ao nome, regressão, pouco contato social, rigidez intensa ou sofrimento familiar são sinais de alerta.</p></div><div class="card"><h3>Autismo tem cura?</h3><p>Não é uma doença simples com cura. É uma condição do neurodesenvolvimento. Com apoio, pode haver grande evolução.</p></div><div class="card"><h3>Como a escola ajuda?</h3><p>Com rotina visual, previsibilidade, adaptação sensorial, comunicação alternativa e parceria com a família.</p></div></div></section>
-<section id="declaracoes" class="screen"><div class="grid2"><div class="card"><h2>Deixe uma declaração</h2><label>Nome ou apelido</label><input id="nome_depoimento"><label>Mensagem</label><textarea id="texto_depoimento"></textarea><button class="btn" onclick="salvarDepoimento()">Publicar</button></div><div class="card"><h2>Mural de força</h2><div id="listaDepoimentos"></div></div></div></section>
-<section id="painel" class="screen"><div class="card"><h2>Painel estatístico</h2><button class="btn alt" onclick="carregarEstatisticas()">Atualizar</button><div class="stats"><div class="stat"><strong id="totalRespostas">0</strong><span>respostas</span></div><div class="stat"><strong id="mediaEscore">0</strong><span>média</span></div><div class="stat"><strong id="altoRisco">0</strong><span>alto risco</span></div></div><canvas id="chartRisco"></canvas><canvas id="chartRede"></canvas><canvas id="chartDiagnostico"></canvas></div></section>
-</main><footer>Rede Azul — ferramenta educativa. Em sofrimento intenso, risco de violência, abandono, ideação suicida ou crise grave, procure atendimento de urgência.</footer>
-<script>
+<div class="container">
+    <div class="hero">
+        <h1><i class="fas fa-hands-helping"></i> Acolher, Dados e Aprender</h1>
+        <p>Saúde mental de pais/cuidadores de autistas + quiz prático sobre neuroplasticidade e desenvolvimento psicossocial</p>
+    </div>
 
+    <!-- ================= PARTE 1: SAÚDE MENTAL ================= -->
+    <div class="card">
+        <h2><i class="fas fa-chart-line"></i> Questionário de Saúde Mental (Pais e Responsáveis)</h2>
+        <p>Responda às 8 perguntas abaixo sobre como tem se sentido nas últimas duas semanas. Os dados são salvos anonimamente no seu navegador para gerar estatísticas reais e gráficos agregados.</p>
+        
+        <div id="mentalHealthForm">
+            <!-- perguntas serão inseridas via JS para facilitar manutenção -->
+        </div>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <button id="submitMentalBtn" class="btn"><i class="fas fa-save"></i> Enviar respostas & atualizar gráficos</button>
+            <button id="clearMentalDataBtn" class="btn btn-secondary"><i class="fas fa-trash-alt"></i> Limpar todos os dados</button>
+        </div>
+
+        <!-- Estatísticas e gráficos -->
+        <div class="stats" id="statsArea">
+            <h3><i class="fas fa-chart-pie"></i> Estatísticas da comunidade</h3>
+            <div class="stats-grid">
+                <div class="stat-card"><i class="fas fa-users"></i> <span id="totalRespondents">0</span><br>participantes</div>
+                <div class="stat-card"><i class="fas fa-chart-simple"></i> <span id="avgScoreSpan">0</span><br>pontuação média</div>
+                <div class="stat-card"><i class="fas fa-exclamation-triangle"></i> <span id="crisisPercent">0%</span><br>em crise (25-32)</div>
+            </div>
+            <canvas id="mentalChart" width="400" height="250" style="max-width:100%; height:auto;"></canvas>
+            <p class="warning">* Os dados ficam armazenados no seu navegador (localStorage). Compartilhe a página para mais respostas.</p>
+        </div>
+    </div>
+
+    <!-- ================= PARTE 2: QUIZ EDUCATIVO ================= -->
+    <div class="card">
+        <h2><i class="fas fa-brain"></i> Quiz: Neuroplasticidade, Socialização e Aprendizado</h2>
+        <p>15 perguntas didáticas para orientar pais e também educar a sociedade. Clique na resposta correta e veja a explicação imediata.</p>
+        <div id="quizContainer"></div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+            <button id="resetQuizBtn" class="btn btn-secondary"><i class="fas fa-undo-alt"></i> Limminar respostas do quiz</button>
+            <div id="quizScoreDisplay" style="font-weight: bold; background: #e6f0ff; padding: 8px 20px; border-radius: 40px;">✅ Acertos: 0 / 15</div>
+        </div>
+        <p style="margin-top: 14px; font-style: italic; color: #2c5a7a;"><i class="fas fa-lightbulb"></i> Cada resposta traz um feedback explicativo — aprenda enquanto testa seus conhecimentos.</p>
+    </div>
+    <footer>Ferramenta gratuita para apoiar pais e responsáveis. Os dados são sigilosos e servem para gerar consciência sobre a saúde mental dos cuidadores.</footer>
+</div>
+
+<script>
+    // --------------------------------------------------------------
+    // 1. MENTAL HEALTH: 8 perguntas (escala 0-4)
+    // --------------------------------------------------------------
+    const mentalQuestions = [
+        "Nas últimas duas semanas, com que frequência você se sentiu cansado(a) ou sem energia, mesmo após dormir?",
+        "Você se sente sobrecarregado(a) com as demandas diárias relacionadas ao cuidado do seu filho(a)?",
+        "Você tem evitado sair ou encontrar amigos por se sentir julgado(a) em relação ao comportamento do seu filho(a)?",
+        "Você sente que não tem tempo para cuidar da sua própria saúde (consultas, exercícios, lazer)?",
+        "Você tem dificuldade para dormir porque fica pensando no futuro do seu filho(a)?",
+        "Você se sente isolado(a) ou sozinho(a) nessa jornada?",
+        "Você já pensou que seria mais fácil se não existisse?",
+        "Você sente que seu parceiro(a) ou familiares dividem as responsabilidades de forma justa?"
+    ];
+    const likertLabels = ["Nunca (0)", "Raramente (1)", "Às vezes (2)", "Frequentemente (3)", "Sempre (4)"];
+
+    let mentalResponses = []; // array de objetos { totalScore, category, date }
+
+    // Carregar dados do localStorage
+    function loadMentalData() {
+        const stored = localStorage.getItem("autism_parents_mental");
+        if(stored) {
+            mentalResponses = JSON.parse(stored);
+        } else {
+            mentalResponses = [];
+        }
+        updateStatsAndChart();
+    }
+
+    function saveMentalData() {
+        localStorage.setItem("autism_parents_mental", JSON.stringify(mentalResponses));
+        updateStatsAndChart();
+    }
+
+    function getCategory(total) {
+        if(total <= 8) return "Baixo impacto (0-8)";
+        if(total <= 16) return "Estresse moderado (9-16)";
+        if(total <= 24) return "Risco elevado (17-24)";
+        return "Crise – procure ajuda (25-32)";
+    }
+
+    // Renderizar as 8 perguntas na tela
+    function renderMentalForm() {
+        const container = document.getElementById("mentalHealthForm");
+        container.innerHTML = "";
+        mentalQuestions.forEach((q, idx) => {
+            const divRow = document.createElement("div");
+            divRow.className = "question-row";
+            divRow.style.marginBottom = "20px";
+            divRow.style.borderBottom = "1px solid #dee9f2";
+            divRow.style.paddingBottom = "12px";
+            
+            const qText = document.createElement("div");
+            qText.className = "question-text";
+            qText.innerText = `${idx+1}. ${q}`;
+            divRow.appendChild(qText);
+            
+            const optsDiv = document.createElement("div");
+            optsDiv.className = "options";
+            for(let val=0; val<=4; val++) {
+                const label = document.createElement("label");
+                label.className = "option-item";
+                const radio = document.createElement("input");
+                radio.type = "radio";
+                radio.name = `mental_q${idx}`;
+                radio.value = val;
+                radio.required = true;
+                label.appendChild(radio);
+                label.appendChild(document.createTextNode(` ${likertLabels[val]}`));
+                optsDiv.appendChild(label);
+            }
+            divRow.appendChild(optsDiv);
+            container.appendChild(divRow);
+        });
+    }
+
+    // Coletar respostas do formulário (validação)
+    function collectMentalAnswers() {
+        let scores = [];
+        for(let i=0; i<mentalQuestions.length; i++) {
+            const radios = document.getElementsByName(`mental_q${i}`);
+            let selectedVal = null;
+            for(let r of radios) {
+                if(r.checked) {
+                    selectedVal = parseInt(r.value);
+                    break;
+                }
+            }
+            if(selectedVal === null) return null;
+            scores.push(selectedVal);
+        }
+        return scores;
+    }
+
+    let mentalChartInstance = null;
+
+    function updateStatsAndChart() {
+        const totalResp = mentalResponses.length;
+        document.getElementById("totalRespondents").innerText = totalResp;
+        if(totalResp === 0) {
+            document.getElementById("avgScoreSpan").innerText = "0";
+            document.getElementById("crisisPercent").innerText = "0%";
+            if(mentalChartInstance) {
+                mentalChartInstance.data.datasets[0].data = [0,0,0,0];
+                mentalChartInstance.update();
+            }
+            return;
+        }
+        let sumScores = 0;
+        let categoryCount = { "Baixo impacto (0-8)":0, "Estresse moderado (9-16)":0, "Risco elevado (17-24)":0, "Crise – procure ajuda (25-32)":0 };
+        mentalResponses.forEach(resp => {
+            sumScores += resp.totalScore;
+            categoryCount[resp.category]++;
+        });
+        const avg = (sumScores / totalResp).toFixed(1);
+        const crisisPercent = ((categoryCount["Crise – procure ajuda (25-32)"] / totalResp)*100).toFixed(1);
+        document.getElementById("avgScoreSpan").innerText = avg;
+        document.getElementById("crisisPercent").innerText = `${crisisPercent}%`;
+        
+        const chartData = [categoryCount["Baixo impacto (0-8)"], categoryCount["Estresse moderado (9-16)"], categoryCount["Risco elevado (17-24)"], categoryCount["Crise – procure ajuda (25-32)"]];
+        const ctx = document.getElementById('mentalChart').getContext('2d');
+        if(mentalChartInstance) {
+            mentalChartInstance.data.datasets[0].data = chartData;
+            mentalChartInstance.update();
+        } else {
+            mentalChartInstance = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ["Baixo impacto", "Estresse moderado", "Risco elevado", "Crise (urgente)"],
+                    datasets: [{ data: chartData, backgroundColor: ['#2ecc71','#f1c40f','#e67e22','#e74c3c'], borderWidth: 0 }]
+                },
+                options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+            });
+        }
+    }
+
+    // Submeter respostas da saúde mental
+    function submitMental() {
+        const scores = collectMentalAnswers();
+        if(!scores) {
+            alert("Por favor, responda todas as 8 perguntas antes de enviar.");
+            return;
+        }
+        const total = scores.reduce((a,b)=>a+b,0);
+        const category = getCategory(total);
+        mentalResponses.push({ totalScore: total, category: category, date: new Date().toISOString() });
+        saveMentalData();
+        // opcional: pequeno reset visual dos radios (opcional, mas deixamos como está)
+        alert(`Resposta salva! Pontuação total: ${total} - ${category}\nObrigado por contribuir com os dados reais.`);
+        // Não resetamos o form para permitir múltiplas respostas de diferentes familiares.
+    }
+
+    function clearMentalData() {
+        if(confirm("Tem certeza? Isso apagará TODOS os dados agregados de saúde mental. Os gráficos serão resetados.")) {
+            mentalResponses = [];
+            localStorage.removeItem("autism_parents_mental");
+            updateStatsAndChart();
+            alert("Dados removidos com sucesso.");
+        }
+    }
+
+    // --------------------------------------------------------------
+    // 2. QUIZ EDUCATIVO - 15 perguntas
+    // --------------------------------------------------------------
+    const quizData = [
+        { text: "O que é neuroplasticidade, na prática para uma criança autista?", options: ["Capacidade do cérebro de criar e fortalecer conexões por repetição de experiências positivas", "Um tipo de remédio que regenera neurônios", "A exclusão de informações desnecessárias pelo cérebro"], correct: 0, explanation: "Correto! Toda vez que você repete uma brincadeira de imitação, um gesto social ou um treino de espera, o cérebro do seu filho literalmente abre novos 'caminhos' neurais. Não precisa de remédio, precisa de interação previsível e afetiva." },
+        { text: "Qual fator mais atrapalha a neuroplasticidade de uma criança autista?", options: ["Rotina visual", "Estresse crônico e cortisol elevado", "Brincadeiras no chão"], correct: 1, explanation: "Estresse alto (gritos, punições, imprevisibilidade) trava o cérebro. A plasticidade acontece melhor em estado de calma e segurança." },
+        { text: "Para uma criança autista com pouca interação social, qual o melhor começo?", options: ["Levá-la a uma festa com 30 crianças", "Treinar controle de olhar com objetos (ex: pegar um brinquedo perto do seu rosto)", "Forçar abraços em familiares"], correct: 1, explanation: "Antes da pessoa, vem o objeto. A criança aprende a olhar para onde você está olhando. Comece com brinquedos e só depois pessoas próximas." },
+        { text: "Em abordagens comportamentais, o que significa 'reforço positivo'?", options: ["Dar um presente de qualquer jeito quando a criança chora", "Oferecer algo prazeroso imediatamente após um comportamento desejado", "Ignorar comportamentos ruins"], correct: 1, explanation: "Reforço positivo aumenta a chance do comportamento se repetir. Tem que vir logo depois. Ex: a criança pediu 'água' em vez de gritar – você dá água e um sorriso." },
+        { text: "Um pai quer que o filho autista não sofra nenhuma frustração. Isso ajuda?", options: ["Sim, evita crises", "Não, pois a tolerância à frustração também se aprende com pequenos 'nãos' controlados", "Só ajuda se a criança tiver deficiência intelectual"], correct: 1, explanation: "Frustração zero impede o desenvolvimento de flexibilidade. Comece com um 'não, mas depois' seguido de espera de 10 segundos com apoio visual." },
+        { text: "Seu filho não imita gestos. O que fazer primeiro?", options: ["Imitar tudo o que ele fizer primeiro (imitação recíproca)", "Forçar a mão dele a bater palma", "Ignorar, imitação não é importante"], correct: 0, explanation: "Antes de imitar você, a criança precisa perceber que imitar é uma brincadeira. Copie cada som ou movimento que ela fizer. Depois ela começa a imitar você." },
+        { text: "Depois que você dá uma instrução ('pega a bola'), quanto tempo de espera silenciosa uma criança autista pode precisar?", options: ["No máximo 2 segundos", "De 5 a 10 segundos silenciosos", "30 segundos é demais"], correct: 1, explanation: "O tempo de processamento atrasa. Conte mentalmente até 10 antes de repetir. Não fale nesse intervalo – o barulho atrapalha." },
+        { text: "Uma pessoa na rua reclama que seu filho está fazendo estereotipias (balançar as mãos). O que é mais didático responder?", options: ["'Ele tem autismo, deixa ele'", "'Esse movimento ajuda ele a se autorregular. É como respiração para você'", "Xingar a pessoa"], correct: 1, explanation: "Explicar a função (acalmar, processar estímulos) educa a sociedade sem humilhar a criança." },
+        { text: "Para reduzir crises de transição, o mais eficaz é:", options: ["Avisar de boca: 'vamos parar em 5 minutos'", "Usar um quadro de rotina com figuras", "Mudar a ordem das atividades todo dia para 'treinar flexibilidade'"], correct: 1, explanation: "Crianças autistas têm memória de trabalho diferente. Imagens fixas previsíveis reduzem ansiedade. Com o tempo, introduza pequenas trocas." },
+        { text: "Como ensinar a esperar a vez num brinquedo?", options: ["Apenas dizer 'espere'", "Usar um timer visual (ampulheta de areia) e um boneco que 'espera' primeiro", "Tirar o brinquedo"], correct: 1, explanation: "Você precisa mostrar o que é 'esperar'. Use um boneco: o boneco espera a ampulheta acabar, ganha o brinquedo. Depois seu filho faz igual." },
+        { text: "Seu filho está com as mãos nos ouvidos e se balançando. Você deve:", options: ["Mandá-lo parar imediatamente", "Reduzir luz e barulho do ambiente (oferecer pausa sensorial)", "Aumentar o estímulo para 'acostumar'"], correct: 1, explanation: "Esses comportamentos são sinais de sobrecarga. Aprender só acontece se o cérebro não estiver em alerta máximo. A pausa sensorial é fundamental." },
+        { text: "Seu filho aprendeu a dar 'tchau' com a terapeuta, mas não com a avó. Isso é normal?", options: ["Não, ele deveria generalizar sozinho", "Sim, é preciso treinar com pessoas diferentes e lugares diferentes", "Ele precisa de mais sessões de terapia"], correct: 1, explanation: "Crianças autistas têm dificuldade de generalizar. Treine explicitamente: tchau com a terapeuta, com você, com a avó, no parque." },
+        { text: "O que é mais útil para uma criança não-verbal ou com pouca fala?", options: ["Esperar ela falar magicamente", "Ensinar um sistema de troca de figuras (PECS) ou pranchas de comunicação", "Forçar o som 'mamãe'"], correct: 1, explanation: "Comunicação reduz frustração e comportamentos difíceis. Figuras ou dispositivos NÃO atrapalham a fala – abrem caminho para ela." },
+        { text: "Seu filho só gosta de trens. Como usar isso para ensino?", options: ["Proibir trens até ele fazer outras coisas", "Usar trens para ensinar cores, números, espera e socialização ('me dá o trem azul')", "Ignorar os trens"], correct: 1, explanation: "Interesse restrito é a porta de entrada para o cérebro. Dentro desse tema você ensina praticamente qualquer habilidade." },
+        { text: "Qual atitude mais protege a saúde mental dos pais e, por tabela, o desenvolvimento do filho?", options: ["Focar 100% na criança, abrindo mão da própria vida", "Reservar 20 minutos por dia para algo que dê prazer (café sozinho, caminhada) sem culpa", "Comparar seu filho com outra criança autista que 'evolui mais'"], correct: 1, explanation: "Não é egoísmo. Pais regulados geram ambiente neuroplástico. Uma pausa pequena e consistente previne burnout e melhora a paciência para ensinar." }
+    ];
+
+    let userSelections = new Array(15).fill(null); // armazena índice selecionado
+    let quizFeedbackShown = new Array(15).fill(false);
+
+    function renderQuiz() {
+        const container = document.getElementById("quizContainer");
+        container.innerHTML = "";
+        quizData.forEach((q, idx) => {
+            const qDiv = document.createElement("div");
+            qDiv.className = "quiz-question";
+            qDiv.setAttribute("data-qidx", idx);
+            const title = document.createElement("h4");
+            title.innerText = `${idx+1}. ${q.text}`;
+            qDiv.appendChild(title);
+            const optsDiv = document.createElement("div");
+            optsDiv.className = "quiz-options";
+            q.options.forEach((opt, optIdx) => {
+                const optLabel = document.createElement("label");
+                optLabel.className = "quiz-option";
+                const radio = document.createElement("input");
+                radio.type = "radio";
+                radio.name = `quiz_q${idx}`;
+                radio.value = optIdx;
+                if(userSelections[idx] === optIdx) radio.checked = true;
+                radio.addEventListener("change", (function(qIdx, oIdx) {
+                    return function() {
+                        if(this.checked) {
+                            handleQuizAnswer(qIdx, oIdx);
+                        }
+                    };
+                })(idx, optIdx));
+                optLabel.appendChild(radio);
+                optLabel.appendChild(document.createTextNode(opt));
+                optsDiv.appendChild(optLabel);
+            });
+            qDiv.appendChild(optsDiv);
+            const feedbackDiv = document.createElement("div");
+            feedbackDiv.className = "feedback";
+            feedbackDiv.id = `feedback_${idx}`;
+            if(userSelections[idx] !== null) {
+                // exibir feedback já existente
+                const isCorrect = (userSelections[idx] === q.correct);
+                const correctText = q.options[q.correct];
+                feedbackDiv.innerHTML = isCorrect ? `✅ Correto! ${q.explanation}` : `❌ Resposta incorreta. O correto é: "${correctText}". ${q.explanation}`;
+                feedbackDiv.classList.add("show");
+            }
+            qDiv.appendChild(feedbackDiv);
+            container.appendChild(qDiv);
+        });
+        updateQuizScore();
+    }
+
+    function handleQuizAnswer(questionIdx, selectedIdx) {
+        userSelections[questionIdx] = selectedIdx;
+        const q = quizData[questionIdx];
+        const isCorrect = (selectedIdx === q.correct);
+        const feedbackDiv = document.getElementById(`feedback_${questionIdx}`);
+        const correctAnswerText = q.options[q.correct];
+        if(isCorrect) {
+            feedbackDiv.innerHTML = `✅ Correto! ${q.explanation}`;
+        } else {
+            feedbackDiv.innerHTML = `❌ Não é bem isso. A resposta correta é: "${correctAnswerText}". ${q.explanation}`;
+        }
+        feedbackDiv.classList.add("show");
+        
+        // marcação visual nos radio labels (opcional)
+        const parentDiv = document.getElementById(`feedback_${questionIdx}`).parentElement;
+        const allRadios = parentDiv.querySelectorAll('.quiz-option');
+        allRadios.forEach((opt, idx) => {
+            opt.classList.remove("selected-correct", "selected-wrong");
+            if(idx === q.correct) opt.classList.add("selected-correct");
+            if(userSelections[questionIdx] !== null && idx === userSelections[questionIdx] && idx !== q.correct) opt.classList.add("selected-wrong");
+        });
+        updateQuizScore();
+        saveQuizSelectionsToLocal();
+    }
+
+    function updateQuizScore() {
+        let correctCount = 0;
+        for(let i=0; i<quizData.length; i++) {
+            if(userSelections[i] !== null && userSelections[i] === quizData[i].correct) correctCount++;
+        }
+        document.getElementById("quizScoreDisplay").innerHTML = `✅ Acertos: ${correctCount} / ${quizData.length}`;
+    }
+
+    function resetQuiz() {
+        userSelections = new Array(15).fill(null);
+        for(let i=0; i<quizData.length; i++) {
+            const feedbackDiv = document.getElementById(`feedback_${i}`);
+            if(feedbackDiv) {
+                feedbackDiv.classList.remove("show");
+                feedbackDiv.innerHTML = "";
+            }
+            // limpar radios
+            const radios = document.getElementsByName(`quiz_q${i}`);
+            radios.forEach(r => r.checked = false);
+            // remover classes visuais
+            const parentDiv = feedbackDiv ? feedbackDiv.parentElement : null;
+            if(parentDiv) {
+                const opts = parentDiv.querySelectorAll('.quiz-option');
+                opts.forEach(opt => opt.classList.remove("selected-correct", "selected-wrong"));
+            }
+        }
+        updateQuizScore();
+        localStorage.removeItem("quiz_parents_selections");
+    }
+
+    function saveQuizSelectionsToLocal() {
+        localStorage.setItem("quiz_parents_selections", JSON.stringify(userSelections));
+    }
+
+    function loadQuizSelections() {
+        const stored = localStorage.getItem("quiz_parents_selections");
+        if(stored) {
+            const arr = JSON.parse(stored);
+            if(arr && arr.length === 15) {
+                userSelections = arr;
+            }
+        }
+        renderQuiz(); // isso aplica as seleções salvas
+    }
+
+    // Inicialização
+    function init() {
+        renderMentalForm();
+        loadMentalData();
+        renderQuiz();
+        loadQuizSelections();
+        document.getElementById("submitMentalBtn").addEventListener("click", submitMental);
+        document.getElementById("clearMentalDataBtn").addEventListener("click", clearMentalData);
+        document.getElementById("resetQuizBtn").addEventListener("click", () => { resetQuiz(); saveQuizSelectionsToLocal(); });
+        // salvar automático sempre que uma resposta do quiz mudar (dentro de handle já salva)
+    }
+
+    init();
+</script>
 </body>
 </html>
