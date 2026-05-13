@@ -1,0 +1,592 @@
+<!DOCTYPE html><html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Enquete | Saúde Mental de Pais de Pessoas com Autismo</title>  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --card2: #1e293b;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --primary: #38bdf8;
+      --primary-dark: #0284c7;
+      --danger: #f87171;
+      --warning: #facc15;
+      --success: #4ade80;
+      --border: rgba(148, 163, 184, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: radial-gradient(circle at top, #1e3a8a 0, #0f172a 38%, #020617 100%);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    header {
+      padding: 32px 20px 18px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0 0 10px;
+      font-size: clamp(1.6rem, 4vw, 2.5rem);
+    }
+
+    header p {
+      margin: 0 auto;
+      max-width: 860px;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    main {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 20px;
+    }
+
+    section, .card {
+      background: rgba(17, 24, 39, 0.92);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 22px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+      backdrop-filter: blur(10px);
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #f8fafc;
+      font-size: 1.25rem;
+    }
+
+    .notice {
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: #dbeafe;
+      padding: 14px;
+      border-radius: 16px;
+      font-size: 0.94rem;
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      margin: 15px 0 6px;
+      font-weight: bold;
+      color: #f1f5f9;
+    }
+
+    small {
+      display: block;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px 13px;
+      border-radius: 13px;
+      border: 1px solid var(--border);
+      background: #020617;
+      color: var(--text);
+      outline: none;
+      font-size: 0.98rem;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.16);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .question {
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(30, 41, 59, 0.55);
+      margin-top: 13px;
+    }
+
+    .question label {
+      margin-top: 0;
+    }
+
+    .scale {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .scale input {
+      display: none;
+    }
+
+    .scale span {
+      display: block;
+      text-align: center;
+      padding: 10px 4px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #020617;
+      cursor: pointer;
+      transition: 0.18s;
+      font-size: 0.88rem;
+    }
+
+    .scale input:checked + span {
+      background: var(--primary);
+      color: #00111f;
+      border-color: var(--primary);
+      font-weight: bold;
+      transform: translateY(-1px);
+    }
+
+    button {
+      border: none;
+      border-radius: 15px;
+      padding: 13px 16px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      color: #00111f;
+      background: linear-gradient(135deg, var(--primary), #7dd3fc);
+      margin-top: 18px;
+      width: 100%;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.06);
+    }
+
+    button.secondary {
+      background: #1e293b;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .result-box {
+      margin-top: 18px;
+      padding: 16px;
+      border-radius: 16px;
+      background: #020617;
+      border: 1px solid var(--border);
+      display: none;
+    }
+
+    .result-title {
+      font-size: 1.15rem;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    .low { color: var(--success); }
+    .moderate { color: var(--warning); }
+    .high { color: var(--danger); }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .stat {
+      background: #020617;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 1.55rem;
+      color: var(--primary);
+    }
+
+    .stat span {
+      font-size: 0.84rem;
+      color: var(--muted);
+    }
+
+    canvas {
+      background: #020617;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 10px;
+      margin-top: 14px;
+    }
+
+    footer {
+      max-width: 1120px;
+      margin: 10px auto 28px;
+      padding: 0 20px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      text-align: center;
+    }
+
+    @media (max-width: 900px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+
+      .grid-2, .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style></head>
+<body>
+  <header>
+    <h1>Enquete sobre Saúde Mental de Pais de Pessoas com Autismo</h1>
+    <p>
+      Instrumento simples para levantamento social, educacional e assistencial. Não substitui avaliação médica, psicológica ou psiquiátrica.
+    </p>
+  </header>  <main>
+    <section>
+      <h2>Responder enquete</h2><div class="notice">
+    As respostas são para fins de levantamento estatístico. Evite inserir nome completo, CPF, telefone ou dados que identifiquem diretamente a família.
+  </div>
+
+  <form id="surveyForm">
+    <div class="grid-2">
+      <div>
+        <label for="idade_pai_mae">Idade do pai/mãe/cuidador</label>
+        <input type="number" id="idade_pai_mae" min="15" max="100" required />
+      </div>
+
+      <div>
+        <label for="vinculo">Vínculo com a pessoa autista</label>
+        <select id="vinculo" required>
+          <option value="">Selecione</option>
+          <option value="Mãe">Mãe</option>
+          <option value="Pai">Pai</option>
+          <option value="Avó/Avô">Avó/Avô</option>
+          <option value="Outro cuidador">Outro cuidador</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div>
+        <label for="idade_filho">Idade da pessoa autista</label>
+        <input type="number" id="idade_filho" min="0" max="80" required />
+      </div>
+
+      <div>
+        <label for="tempo_diagnostico">Tempo desde o diagnóstico</label>
+        <select id="tempo_diagnostico" required>
+          <option value="">Selecione</option>
+          <option value="Menos de 6 meses">Menos de 6 meses</option>
+          <option value="6 meses a 1 ano">6 meses a 1 ano</option>
+          <option value="1 a 3 anos">1 a 3 anos</option>
+          <option value="Mais de 3 anos">Mais de 3 anos</option>
+          <option value="Ainda sem diagnóstico fechado">Ainda sem diagnóstico fechado</option>
+        </select>
+      </div>
+    </div>
+
+    <label for="como_recebeu">Como você recebeu a informação sobre o diagnóstico?</label>
+    <select id="como_recebeu" required>
+      <option value="">Selecione</option>
+      <option value="Com acolhimento e explicação adequada">Com acolhimento e explicação adequada</option>
+      <option value="Com pouca explicação">Com pouca explicação</option>
+      <option value="De forma fria ou traumática">De forma fria ou traumática</option>
+      <option value="Descobri por conta própria antes do profissional">Descobri por conta própria antes do profissional</option>
+      <option value="Ainda estou tentando entender">Ainda estou tentando entender</option>
+    </select>
+
+    <label for="rede_apoio">Você possui rede de apoio?</label>
+    <select id="rede_apoio" required>
+      <option value="">Selecione</option>
+      <option value="Boa rede de apoio">Boa rede de apoio</option>
+      <option value="Pouca rede de apoio">Pouca rede de apoio</option>
+      <option value="Nenhuma rede de apoio">Nenhuma rede de apoio</option>
+    </select>
+
+    <label for="terapias">Atualmente a pessoa autista realiza acompanhamento?</label>
+    <select id="terapias" required>
+      <option value="">Selecione</option>
+      <option value="Sim, regularmente">Sim, regularmente</option>
+      <option value="Sim, mas de forma irregular">Sim, mas de forma irregular</option>
+      <option value="Não realiza, mas precisa">Não realiza, mas precisa</option>
+      <option value="Não sei informar">Não sei informar</option>
+    </select>
+
+    <h2 style="margin-top: 24px;">Escala de sobrecarga emocional</h2>
+    <small>Marque de 1 a 5, sendo 1 = nunca/muito pouco e 5 = sempre/muito intenso.</small>
+
+    <div id="questions"></div>
+
+    <label for="comentario">Comentário livre, opcional</label>
+    <textarea id="comentario" placeholder="Escreva algo que você gostaria que profissionais, escolas ou gestores públicos soubessem..."></textarea>
+
+    <button type="submit">Enviar resposta</button>
+  </form>
+
+  <div id="resultBox" class="result-box"></div>
+</section>
+
+<aside>
+  <div class="card">
+    <h2>Painel estatístico</h2>
+    <div class="stats-grid">
+      <div class="stat">
+        <strong id="totalRespostas">0</strong>
+        <span>respostas</span>
+      </div>
+      <div class="stat">
+        <strong id="mediaEscore">0</strong>
+        <span>média do escore</span>
+      </div>
+    </div>
+
+    <button class="secondary" onclick="carregarEstatisticas()">Atualizar gráficos</button>
+
+    <canvas id="chartRisco"></canvas>
+    <canvas id="chartRede"></canvas>
+    <canvas id="chartDiagnostico"></canvas>
+  </div>
+</aside>
+
+  </main>  <footer>
+    Este formulário gera um indicador de risco psicossocial apenas para triagem coletiva e estatística. Em caso de sofrimento intenso, ideação suicida ou risco imediato, procure atendimento de urgência.
+  </footer>  <script>
+    // 1) CRIE UMA CONTA NO SUPABASE
+    // 2) CRIE UM PROJETO
+    // 3) COLE A URL E A ANON KEY ABAIXO
+    const SUPABASE_URL = "COLE_AQUI_SUA_SUPABASE_URL";
+    const SUPABASE_ANON_KEY = "COLE_AQUI_SUA_SUPABASE_ANON_KEY";
+
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const perguntas = [
+      "Tenho me sentido emocionalmente esgotado(a).",
+      "Sinto culpa, medo ou insegurança em relação ao futuro do meu filho.",
+      "Tenho dificuldade para dormir por preocupação ou ansiedade.",
+      "Sinto que minha vida social diminuiu muito após o diagnóstico.",
+      "Tenho dificuldade de cuidar da minha própria saúde.",
+      "Sinto que recebi pouca orientação prática dos profissionais.",
+      "Tenho dificuldade para lidar com crises, seletividade alimentar, sono ou comportamento.",
+      "Sinto falta de apoio da escola, família ou serviços de saúde.",
+      "Consigo brincar, estimular ou realizar atividades estruturadas com meu filho.",
+      "Sinto esperança e percebo evolução, mesmo com dificuldades."
+    ];
+
+    const questionsDiv = document.getElementById("questions");
+
+    perguntas.forEach((texto, index) => {
+      const q = document.createElement("div");
+      q.className = "question";
+      q.innerHTML = `
+        <label>${index + 1}. ${texto}</label>
+        <div class="scale">
+          ${[1,2,3,4,5].map(valor => `
+            <label>
+              <input type="radio" name="q${index + 1}" value="${valor}" required>
+              <span>${valor}</span>
+            </label>
+          `).join("")}
+        </div>
+      `;
+      questionsDiv.appendChild(q);
+    });
+
+    function calcularResultado(respostas) {
+      // Perguntas 9 e 10 são protetoras. Por isso, a pontuação é invertida.
+      const respostasAjustadas = respostas.map((valor, index) => {
+        if (index === 8 || index === 9) return 6 - valor;
+        return valor;
+      });
+
+      const escore = respostasAjustadas.reduce((soma, valor) => soma + valor, 0);
+      let classificacao = "Baixo risco de sobrecarga";
+      let classe = "low";
+      let orientacao = "Há sinais menores de sobrecarga, mas ainda é importante manter rede de apoio, rotina de autocuidado e orientação profissional.";
+
+      if (escore >= 24 && escore <= 36) {
+        classificacao = "Risco moderado de sobrecarga";
+        classe = "moderate";
+        orientacao = "Há sinais relevantes de desgaste emocional. Pode ser útil buscar apoio psicológico, grupos de apoio, divisão de tarefas e orientação sobre manejo diário.";
+      }
+
+      if (escore >= 37) {
+        classificacao = "Alto risco de sobrecarga";
+        classe = "high";
+        orientacao = "Há forte sinal de sofrimento e sobrecarga. Recomenda-se avaliação profissional, fortalecimento urgente da rede de apoio e cuidado ativo com a saúde mental do cuidador.";
+      }
+
+      return { escore, classificacao, classe, orientacao };
+    }
+
+    document.getElementById("surveyForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const respostas = perguntas.map((_, index) => {
+        return Number(document.querySelector(`input[name="q${index + 1}"]:checked`).value);
+      });
+
+      const resultado = calcularResultado(respostas);
+
+      const dados = {
+        idade_pai_mae: Number(document.getElementById("idade_pai_mae").value),
+        vinculo: document.getElementById("vinculo").value,
+        idade_filho: Number(document.getElementById("idade_filho").value),
+        tempo_diagnostico: document.getElementById("tempo_diagnostico").value,
+        como_recebeu: document.getElementById("como_recebeu").value,
+        rede_apoio: document.getElementById("rede_apoio").value,
+        terapias: document.getElementById("terapias").value,
+        q1: respostas[0],
+        q2: respostas[1],
+        q3: respostas[2],
+        q4: respostas[3],
+        q5: respostas[4],
+        q6: respostas[5],
+        q7: respostas[6],
+        q8: respostas[7],
+        q9: respostas[8],
+        q10: respostas[9],
+        escore: resultado.escore,
+        classificacao: resultado.classificacao,
+        comentario: document.getElementById("comentario").value.trim()
+      };
+
+      const { error } = await supabaseClient
+        .from("respostas_autismo_pais")
+        .insert([dados]);
+
+      const resultBox = document.getElementById("resultBox");
+      resultBox.style.display = "block";
+
+      if (error) {
+        resultBox.innerHTML = `
+          <div class="result-title high">Erro ao enviar</div>
+          <p>Verifique se a URL, a chave do Supabase e a tabela foram configuradas corretamente.</p>
+          <small>${error.message}</small>
+        `;
+        return;
+      }
+
+      resultBox.innerHTML = `
+        <div class="result-title ${resultado.classe}">${resultado.classificacao}</div>
+        <p><strong>Escore:</strong> ${resultado.escore} pontos</p>
+        <p>${resultado.orientacao}</p>
+      `;
+
+      event.target.reset();
+      carregarEstatisticas();
+    });
+
+    let chartRisco;
+    let chartRede;
+    let chartDiagnostico;
+
+    function contarPorCampo(lista, campo) {
+      return lista.reduce((acc, item) => {
+        const chave = item[campo] || "Não informado";
+        acc[chave] = (acc[chave] || 0) + 1;
+        return acc;
+      }, {});
+    }
+
+    function montarGrafico(canvasId, chartAtual, titulo, dados) {
+      const labels = Object.keys(dados);
+      const values = Object.values(dados);
+
+      if (chartAtual) chartAtual.destroy();
+
+      return new Chart(document.getElementById(canvasId), {
+        type: "bar",
+        data: {
+          labels,
+          datasets: [{
+            label: titulo,
+            data: values
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            title: {
+              display: true,
+              text: titulo,
+              color: "#e5e7eb"
+            }
+          },
+          scales: {
+            x: { ticks: { color: "#cbd5e1" }, grid: { color: "rgba(148,163,184,0.12)" } },
+            y: { ticks: { color: "#cbd5e1" }, grid: { color: "rgba(148,163,184,0.12)" }, beginAtZero: true }
+          }
+        }
+      });
+    }
+
+    async function carregarEstatisticas() {
+      const { data, error } = await supabaseClient
+        .from("respostas_autismo_pais")
+        .select("classificacao, rede_apoio, tempo_diagnostico, escore, created_at")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      document.getElementById("totalRespostas").textContent = data.length;
+
+      const media = data.length
+        ? data.reduce((soma, item) => soma + Number(item.escore || 0), 0) / data.length
+        : 0;
+
+      document.getElementById("mediaEscore").textContent = media.toFixed(1);
+
+      chartRisco = montarGrafico(
+        "chartRisco",
+        chartRisco,
+        "Classificação de sobrecarga",
+        contarPorCampo(data, "classificacao")
+      );
+
+      chartRede = montarGrafico(
+        "chartRede",
+        chartRede,
+        "Rede de apoio",
+        contarPorCampo(data, "rede_apoio")
+      );
+
+      chartDiagnostico = montarGrafico(
+        "chartDiagnostico",
+        chartDiagnostico,
+        "Tempo desde o diagnóstico",
+        contarPorCampo(data, "tempo_diagnostico")
+      );
+    }
+
+    carregarEstatisticas();
+  </script></body>
+</html><!--
